@@ -23,21 +23,27 @@ export default class MatchesService {
     ],
   };
 
-  public static async getAllMatches(): Promise<ServiceResponse<any, ServiceMessage>> {
+  private static formatMatch(match: any): any {
+    return {
+      id: match.dataValues.id,
+      homeTeamId: match.dataValues.home_team_id,
+      homeTeamGoals: match.dataValues.home_team_goals,
+      awayTeamId: match.dataValues.away_team_id,
+      awayTeamGoals: match.dataValues.away_team_goals,
+      inProgress: !!match.dataValues.in_progress,
+      homeTeam: { teamName: match.dataValues.home_team_name },
+      awayTeam: { teamName: match.dataValues.away_team_name },
+    };
+  }
+
+  public static async getMatches(inProgress: string | undefined):
+  Promise<ServiceResponse<any, ServiceMessage>> {
+    if (inProgress !== undefined) {
+      this.queryParameters.where = { inProgress: (inProgress === 'true') };
+    }
     try {
       const matches = await MatchesModel.findAll(this.queryParameters);
-      return {
-        status: HTTP_STATUS.OK,
-        data: matches.map((match: any) => ({
-          id: match.dataValues.id,
-          homeTeamId: match.dataValues.home_team_id,
-          homeTeamGoals: match.dataValues.home_team_goals,
-          awayTeamId: match.dataValues.away_team_id,
-          awayTeamGoals: match.dataValues.away_team_goals,
-          inProgress: !!match.dataValues.in_progress,
-          homeTeam: { teamName: match.dataValues.home_team_name },
-          awayTeam: { teamName: match.dataValues.away_team_name },
-        })) };
+      return { status: HTTP_STATUS.OK, data: matches.map(this.formatMatch) };
     } catch (error) {
       return { status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
         data: { message: MSG.ERROR_FETCHING_MATCHES } };

@@ -4,6 +4,6 @@ import MatchesController from '../controllers/MatchesController';
 
 const matchesRouter = Router();
 
-matchesRouter.get('/', MatchesController.getAllMatches);
+matchesRouter.get('/', MatchesController.getMatches);
 
 export default matchesRouter;
