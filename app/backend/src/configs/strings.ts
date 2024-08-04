@@ -1,4 +1,5 @@
-/* export const HTTP_STATUS = {
+/* eslint-disable @typescript-eslint/naming-convention */
+export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
   NO_CONTENT: 204,
@@ -17,17 +18,16 @@ export const JOI_ERROR_CODE = {
   'number.empty': HTTP_STATUS.UNPROCESSABLE_ENTITY,
   'number.min': HTTP_STATUS.UNPROCESSABLE_ENTITY,
   'string.base': HTTP_STATUS.UNPROCESSABLE_ENTITY,
-  'string.min': HTTP_STATUS.UNPROCESSABLE_ENTITY,
-  'string.email': HTTP_STATUS.BAD_REQUEST,
+  'string.min': HTTP_STATUS.UNAUTHORIZED,
+  'string.email': HTTP_STATUS.UNAUTHORIZED,
   'string.empty': HTTP_STATUS.BAD_REQUEST,
 };
 
 export const MSG = {
   VALIDATE_FIELD: 'Some required fields are missing',
-  INVALID_FIELDS: 'Invalid fields',
+  INVALID_FIELDS: 'All fields must be filled',
   DISPLAYNAME_NOT_VALID: '"displayName" length must be at least 8 characters long',
   EMAIL_NOT_VALID: '"email" must be a valid email',
-  PASSWORD_NOT_VALID: '"password" length must be at least 6 characters long',
   USER_ALREADY_REGISTERED: 'User already registered',
   INVALID_USER: 'User does not exist',
   UNAUTHORIZED_USER: 'Unauthorized user',
@@ -40,7 +40,7 @@ export const MSG = {
   PASSWORD_NOT_FOUND: 'Password not found',
   PASSWORD_EMPTY: 'The password is empty',
   TOKEN_NOT_FOUND: 'Token not found',
-  TOKEN_NOT_VALID: 'Expired or invalid token',
+  TOKEN_NOT_VALID: 'Token must be a valid token',
   DISPLAYNAME_NOT_FOUND: 'Displayname not found',
   NAME_NOT_STRING: '"name" must be a string',
   NAME_NOT_FOUND: '"name" is required',
@@ -51,14 +51,15 @@ export const MSG = {
   USERID_REQUIRED: '"userId" is required',
   USERID_NOT_NUMBER: '"userId" must be a number',
   USERID_NOT_FOUND: '"userId" not found',
-  MISSING_USERNAME_OR_PASSWORD: '"username" and "password" are required',
-  INVALID_USERNAME_OR_PASSWORD: 'Username or password invalid',
+  INVALID_EMAIL_OR_PASSWORD: 'Invalid email or password',
+  ERROR_FETCHING_TEAM: 'Error fetching team',
+  ERROR_FETCHING_TEAMS: 'Error fetching teams',
+  TEAM_NOT_FOUND: 'Team not found',
 };
 
 export const ROUTE = {
-  TEAM: '/teams',
+  TEAMS: '/teams',
   LOGIN: '/login',
-  MATCHE: '/matches',
+  MATCHES: '/matches',
   LEADERBOARD: '/leaderboard',
 };
- */

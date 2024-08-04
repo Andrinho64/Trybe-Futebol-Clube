@@ -1,8 +1,10 @@
 import * as express from 'express';
 import 'express-async-errors';
+import { ROUTE } from './configs/strings';
 
 import errorMiddleware from './middlewares/errorMiddleware';
 import teamRouter from './routes/teamRouter';
+import loginRouter from './routes/loginRouter';
 
 class App {
   public app: express.Express;
@@ -31,7 +33,8 @@ class App {
     this.app.use(express.json());
     this.app.use(accessControl);
 
-    this.app.use(teamRouter);
+    this.app.use(ROUTE.LOGIN, loginRouter);
+    this.app.use(ROUTE.TEAMS, teamRouter);
   }
 
   public start(PORT: string | number): void {
