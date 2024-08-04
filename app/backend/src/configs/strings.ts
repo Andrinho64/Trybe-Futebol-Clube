@@ -54,6 +54,9 @@ enum MSG {
   ERROR_FETCHING_TEAM = 'Error fetching team',
   ERROR_FETCHING_TEAMS = 'Error fetching teams',
   TEAM_NOT_FOUND = 'Team not found',
+  INVALID_MATCH = 'It is not possible to create a match with two equal teams',
+  TEAM_NO_SUCH_ID = 'There is no team with such id!',
+  ERROR_FETCHING_MATCHES = 'Error fetching matches',
 }
 
 enum ROUTE {
