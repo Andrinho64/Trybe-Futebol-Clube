@@ -6,6 +6,6 @@ const matchesRouter = Router();
 
 matchesRouter.get('/', MatchesController.getMatches);
 matchesRouter.patch('/:id/finish', tokenHandler, MatchesController.finishMatch);
-// matchesRouter.patch('/:id', MatchesController.updateMatch);
+matchesRouter.patch('/:id', tokenHandler, MatchesController.updateMatch);
 
 export default matchesRouter;

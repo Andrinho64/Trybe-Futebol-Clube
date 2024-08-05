@@ -64,4 +64,21 @@ export default class MatchesService {
         data: { message: MSG.INTERNAL_SERVER_ERROR } };
     }
   }
+
+  public static async updateMatch(id: number, homeTeamGoals: number, awayTeamGoals: number)
+    : Promise<ServiceResponse<any, ServiceMessage>> {
+    try {
+      const match = await MatchesModel.findByPk(id);
+      if (!match) {
+        return { status: HTTP_STATUS.NOT_FOUND, data: { message: MSG.INVALID_MATCH } };
+      }
+      match.homeTeamGoals = homeTeamGoals;
+      match.awayTeamGoals = awayTeamGoals;
+      await match.save();
+      return { status: HTTP_STATUS.OK, data: { message: MSG.FINISHED } };
+    } catch (error) {
+      return { status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        data: { message: MSG.INTERNAL_SERVER_ERROR } };
+    }
+  }
 }
