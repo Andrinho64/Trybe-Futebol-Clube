@@ -71,14 +71,12 @@ export default class MatchesService {
 
   public static async updateMatch(id: number, homeTeamGoals: number, awayTeamGoals: number)
     : Promise<ServiceResponse<any, ServiceMessage>> {
+    const match: MatchData = { homeTeamGoals, awayTeamGoals } as MatchData;
     try {
-      const match = await MatchesModel.findByPk(id);
-      if (!match) {
-        return { status: HTTP_STATUS.NOT_FOUND, data: { message: MSG.INVALID_MATCH } };
+      const [affectedRows] = await MatchesModel.update(match, { where: { id } });
+      if (affectedRows === 0) {
+        return { status: HTTP_STATUS.UNPROCESSABLE_ENTITY, data: { message: MSG.INVALID_MATCH } };
       }
-      match.homeTeamGoals = homeTeamGoals;
-      match.awayTeamGoals = awayTeamGoals;
-      await match.save();
       return { status: HTTP_STATUS.OK, data: { message: MSG.FINISHED } };
     } catch (error) {
       return { status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -101,21 +99,10 @@ export default class MatchesService {
       }
 
       const newMatch = await MatchesModel.create({ ...matchData, inProgress: true });
-      return { status: HTTP_STATUS.CREATED, data: this.newFormatMatch(newMatch) };
+      return { status: HTTP_STATUS.CREATED, data: newMatch.dataValues };
     } catch (error) {
       return { status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
         data: { message: MSG.ERROR_FETCHING_MATCHES } };
     }
-  }
-
-  private static newFormatMatch(match: any): any {
-    return {
-      id: match.dataValues.id,
-      homeTeamId: match.dataValues.home_team_id,
-      homeTeamGoals: match.dataValues.home_team_goals,
-      awayTeamId: match.dataValues.away_team_id,
-      awayTeamGoals: match.dataValues.away_team_goals,
-      inProgress: !!match.dataValues.in_progress,
-    };
   }
 }
