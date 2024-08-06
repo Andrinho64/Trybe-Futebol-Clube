@@ -5,6 +5,12 @@ import MatchesModel from '../database/models/matchesModel';
 import { ServiceMessage, ServiceResponse } from '../Interfaces/Service';
 import Teams from '../database/models/teamModel';
 
+interface MatchData {
+  homeTeamId: number;
+  homeTeamGoals: number;
+  awayTeamId: number;
+  awayTeamGoals: number;
+}
 export default class MatchesService {
   private static readonly queryParameters: FindOptions<any> = {
     attributes: [
@@ -52,12 +58,10 @@ export default class MatchesService {
 
   public static async finishMatch(id: number): Promise<ServiceResponse<any, ServiceMessage>> {
     try {
-      const match = await MatchesModel.findByPk(id);
-      if (!match) {
-        return { status: HTTP_STATUS.NOT_FOUND, data: { message: MSG.INVALID_MATCH } };
+      const [affectedRows] = await MatchesModel.update({ inProgress: false }, { where: { id } });
+      if (affectedRows === 0) {
+        return { status: HTTP_STATUS.UNPROCESSABLE_ENTITY, data: { message: MSG.INVALID_MATCH } };
       }
-      match.inProgress = false;
-      await match.save();
       return { status: HTTP_STATUS.OK, data: { message: MSG.FINISHED } };
     } catch (error) {
       return { status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -80,5 +84,38 @@ export default class MatchesService {
       return { status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
         data: { message: MSG.INTERNAL_SERVER_ERROR } };
     }
+  }
+
+  public static async newMatch(matchData: MatchData):
+  Promise<ServiceResponse<any, ServiceMessage>> {
+    try {
+      if (matchData.homeTeamId === matchData.awayTeamId) {
+        return { status: HTTP_STATUS.UNPROCESSABLE_ENTITY, data: { message: MSG.INVALID_MATCH } };
+      }
+
+      const homeTeam = await Teams.findByPk(matchData.homeTeamId);
+      const awayTeam = await Teams.findByPk(matchData.awayTeamId);
+
+      if (!homeTeam || !awayTeam) {
+        return { status: HTTP_STATUS.NOT_FOUND, data: { message: MSG.TEAM_NO_SUCH_ID } };
+      }
+
+      const newMatch = await MatchesModel.create({ ...matchData, inProgress: true });
+      return { status: HTTP_STATUS.CREATED, data: this.newFormatMatch(newMatch) };
+    } catch (error) {
+      return { status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        data: { message: MSG.ERROR_FETCHING_MATCHES } };
+    }
+  }
+
+  private static newFormatMatch(match: any): any {
+    return {
+      id: match.dataValues.id,
+      homeTeamId: match.dataValues.home_team_id,
+      homeTeamGoals: match.dataValues.home_team_goals,
+      awayTeamId: match.dataValues.away_team_id,
+      awayTeamGoals: match.dataValues.away_team_goals,
+      inProgress: !!match.dataValues.in_progress,
+    };
   }
 }
