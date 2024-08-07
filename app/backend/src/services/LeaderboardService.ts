@@ -33,26 +33,19 @@ export default class LeaderboardService {
         } else {
           pointAndResult.totalLosses += 1;
         }
-      }
-    });
-
-    return pointAndResult;
+        return acc;
+      }, { totalPoints: 0, totalVictories: 0, totalDraws: 0, totalLosses: 0 });
   }
 
   private static calculateGoals(matches: MatchesModel[], teamId: number)
     : Pick<TeamStats, 'goalsFavor' | 'goalsOwn' > {
-    console.log(matches);
-    let goalsFavor = 0;
-    let goalsOwn = 0;
-
-    matches.forEach((match) => {
-      if (match.homeTeamId === teamId) {
-        goalsFavor += match.homeTeamGoals;
-        goalsOwn += match.homeTeamGoals;
-      }
-    });
-
-    return { goalsFavor, goalsOwn };
+    return matches
+      .filter((match) => match.homeTeamId === teamId)
+      .reduce((acc, match) => {
+        acc.goalsFavor += match.homeTeamGoals;
+        acc.goalsOwn += match.awayTeamGoals;
+        return acc;
+      }, { goalsFavor: 0, goalsOwn: 0 });
   }
 
   private static calculateTeamStats(matches: MatchesModel[], teamId: number, name: string)
