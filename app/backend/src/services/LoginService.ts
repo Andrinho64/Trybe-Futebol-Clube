@@ -29,7 +29,7 @@ export default class LoginService {
   }
 
   public static validate(loginInfo: { email: string, password: string })
-    : Joi.ValidationResult<any> {
+    : Joi.ValidationResult<unknown> {
     return loginSchema.validate(loginInfo);
   }
 

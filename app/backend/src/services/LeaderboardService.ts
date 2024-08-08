@@ -66,7 +66,7 @@ export default class LeaderboardService {
     } as TeamStats;
   }
 
-  public static async getHomeLeaderboard(): Promise<ServiceResponse<any, any>> {
+  public static async getHomeLeaderboard(): Promise<ServiceResponse<number, TeamStats[] | object>> {
     try {
       const teams = await TeamsModel.findAll();
       const matches = await MatchesModel.findAll({ where: { inProgress: false } });

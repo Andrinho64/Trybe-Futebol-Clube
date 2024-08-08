@@ -1,4 +1,4 @@
-import { FindOptions } from 'sequelize';
+import { FindOptions, IncludeOptions, WhereOptions } from 'sequelize';
 import sequelize = require('sequelize');
 import { HTTP_STATUS, MSG } from '../configs/strings';
 import MatchesModel from '../database/models/matchesModel';
@@ -11,8 +11,19 @@ interface MatchData {
   awayTeamId: number;
   awayTeamGoals: number;
 }
+
+interface FormattedMatchData {
+  id: number;
+  homeTeamId: number;
+  homeTeamGoals: number;
+  awayTeamId: number;
+  awayTeamGoals: number;
+  inProgress: boolean;
+  homeTeam: { teamName: string };
+  awayTeam: { teamName: string };
+}
 export default class MatchesService {
-  private static readonly queryParameters: FindOptions<any> = {
+  private static readonly queryParameters: FindOptions<IncludeOptions | WhereOptions> = {
     attributes: [
       'id',
       'home_team_id',
@@ -29,7 +40,7 @@ export default class MatchesService {
     ],
   };
 
-  private static formatMatch(match: any): any {
+  private static formatMatch(match: MatchesModel): FormattedMatchData {
     return {
       id: match.dataValues.id,
       homeTeamId: match.dataValues.home_team_id,
@@ -43,7 +54,7 @@ export default class MatchesService {
   }
 
   public static async getMatches(inProgress: string | undefined):
-  Promise<ServiceResponse<any, ServiceMessage>> {
+  Promise<ServiceResponse<number, ServiceMessage | FormattedMatchData[]>> {
     if (inProgress !== undefined) {
       this.queryParameters.where = { inProgress: (inProgress === 'true') };
     }
@@ -56,7 +67,7 @@ export default class MatchesService {
     }
   }
 
-  public static async finishMatch(id: number): Promise<ServiceResponse<any, ServiceMessage>> {
+  public static async finishMatch(id: number): Promise<ServiceResponse<number, ServiceMessage>> {
     try {
       const [affectedRows] = await MatchesModel.update({ inProgress: false }, { where: { id } });
       if (affectedRows === 0) {
@@ -70,7 +81,7 @@ export default class MatchesService {
   }
 
   public static async updateMatch(id: number, homeTeamGoals: number, awayTeamGoals: number)
-    : Promise<ServiceResponse<any, ServiceMessage>> {
+    : Promise<ServiceResponse<number, ServiceMessage>> {
     const match: MatchData = { homeTeamGoals, awayTeamGoals } as MatchData;
     try {
       const [affectedRows] = await MatchesModel.update(match, { where: { id } });
@@ -85,7 +96,7 @@ export default class MatchesService {
   }
 
   public static async newMatch(matchData: MatchData):
-  Promise<ServiceResponse<any, ServiceMessage>> {
+  Promise<ServiceResponse<number, ServiceMessage>> {
     try {
       if (matchData.homeTeamId === matchData.awayTeamId) {
         return { status: HTTP_STATUS.UNPROCESSABLE_ENTITY, data: { message: MSG.INVALID_MATCH } };
