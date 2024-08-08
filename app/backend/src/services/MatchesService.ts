@@ -55,8 +55,10 @@ export default class MatchesService {
 
   public static async getMatches(inProgress: string | undefined):
   Promise<ServiceResponse<number, ServiceMessage | FormattedMatchData[]>> {
-    if (inProgress !== undefined) {
-      this.queryParameters.where = { inProgress: (inProgress === 'true') };
+    if (inProgress === 'true' || inProgress === 'false') {
+      this.queryParameters.where = { inProgress: inProgress === 'true' };
+    } else {
+      this.queryParameters.where = {};
     }
     try {
       const matches = await MatchesModel.findAll(this.queryParameters);

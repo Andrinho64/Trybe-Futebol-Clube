@@ -4,6 +4,7 @@ import MatchesService from '../services/MatchesService';
 export default class MatchesController {
   static async getMatches(req: Request, res: Response): Promise<void> {
     const inProgress = req.query.inProgress as string | undefined;
+    console.log(inProgress, typeof inProgress);
     const result = await MatchesService.getMatches(inProgress);
     res.status(result.status).json(result.data);
   }
